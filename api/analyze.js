@@ -14,7 +14,6 @@ exports.default = async function handler(req, res) {
     try {
         const { type, images, selfDesc } = req.body;
 
-        // 参数校验
         if (!type || !['moment', 'chat', 'htp'].includes(type)) {
             return res.status(400).json({ success: false, error: '无效分析类型' });
         }
@@ -22,7 +21,6 @@ exports.default = async function handler(req, res) {
             return res.status(400).json({ success: false, error: '图片数量1-3张' });
         }
 
-        // 读取 API Key
         const apiKey = process.env.SILICONFLOW_API_KEY;
         if (!apiKey) {
             return res.status(500).json({
@@ -31,7 +29,6 @@ exports.default = async function handler(req, res) {
             });
         }
 
-        // 模型选择
         let model;
         if (type === 'htp') {
             model = process.env.AI_VISION_MODEL || 'Qwen/Qwen3-VL-8B-Instruct';
