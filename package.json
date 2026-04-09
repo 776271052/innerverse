@@ -1,0 +1,15 @@
+{
+  "name": "innerverse-cloudflare",
+  "version": "10.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler pages dev frontend --binding=DB=innerverse-db --binding=IMAGE_BUCKET=innerverse-images --binding=AI_TASK_QUEUE=ai-tasks",
+    "deploy:consumer": "cd workers/queue-consumer && wrangler deploy",
+    "db:migrate": "wrangler d1 execute innerverse-db --file=./migrations/0001_init.sql"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250109.0",
+    "wrangler": "^3.91.0",
+    "typescript": "^5.0.0"
+  }
+}
