@@ -1,0 +1,19 @@
+{
+  "name": "innerverse",
+  "version": "9.1.0",
+  "description": "内心宇宙 · 综合心理分析平台",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.28.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "vercel": "^34.0.0"
+  },
+  "engines": {
+    "node": "20.x"
+  }
+}
