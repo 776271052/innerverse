@@ -6,6 +6,15 @@ import { verifyAdmin } from './lib/auth.js';
 import { error, success } from './lib/responses.js';
 import { v4 as uuidv4 } from 'uuid';
 
+// ========== 辅助函数：安全获取 URL 参数 ==========
+function getQueryParams(req) {
+    // 构造完整 URL 用于解析参数
+    const host = req.headers.host || 'localhost';
+    const protocol = host.startsWith('localhost') ? 'http' : 'https';
+    const fullUrl = new URL(req.url, `${protocol}://${host}`);
+    return fullUrl.searchParams;
+}
+
 // ========== 处理函数 ==========
 
 // POST /api/upload
@@ -78,8 +87,8 @@ async function handleAnalyze(req, res) {
 
 // GET /api/task
 async function handleGetTask(req, res) {
-    const url = new URL(req.url);
-    const id = url.searchParams.get('id');
+    const params = getQueryParams(req);
+    const id = params.get('id');
     if (!id) return res.status(400).json(error('缺少任务ID'));
 
     try {
@@ -100,28 +109,28 @@ async function handleListTasks(req, res) {
         return res.status(401).json(error('Unauthorized', 401));
     }
 
-    const url = new URL(req.url);
-    const page = parseInt(url.searchParams.get('page')) || 1;
-    const limit = parseInt(url.searchParams.get('limit')) || 20;
-    const status = url.searchParams.get('status') || '';
-    const type = url.searchParams.get('type') || '';
-    const search = url.searchParams.get('search') || '';
+    const params = getQueryParams(req);
+    const page = parseInt(params.get('page')) || 1;
+    const limit = parseInt(params.get('limit')) || 20;
+    const status = params.get('status') || '';
+    const type = params.get('type') || '';
+    const search = params.get('search') || '';
     const offset = (page - 1) * limit;
 
     let whereClauses = [];
-    let params = [];
+    let queryParams = [];
 
     if (status) {
         whereClauses.push('status = ?');
-        params.push(status);
+        queryParams.push(status);
     }
     if (type) {
         whereClauses.push('type = ?');
-        params.push(type);
+        queryParams.push(type);
     }
     if (search) {
         whereClauses.push('id LIKE ?');
-        params.push(`%${search}%`);
+        queryParams.push(`%${search}%`);
     }
 
     const whereClause = whereClauses.length ? `WHERE ${whereClauses.join(' AND ')}` : '';
@@ -129,13 +138,13 @@ async function handleListTasks(req, res) {
     try {
         const countResult = await query(
             `SELECT COUNT(*) as total FROM tasks ${whereClause}`,
-            params
+            queryParams
         );
         const total = countResult.results[0].total;
 
         const dataResult = await query(
             `SELECT id, type, status, provider, created_at FROM tasks ${whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
-            [...params, limit, offset]
+            [...queryParams, limit, offset]
         );
 
         return res.json(success({
@@ -237,25 +246,26 @@ async function handleHealth(req, res) {
     res.json({ status: 'ok', timestamp: Date.now() });
 }
 
-// ========== 路由表 ==========
-const routes = {
-    'POST /upload': handleUpload,
-    'POST /analyze': handleAnalyze,
-    'GET /task': handleGetTask,
-    'GET /tasks': handleListTasks,
-    'GET /stats': handleStats,
-    'GET /announcement': handleAnnouncement,
-    'GET /config': handleGetConfig,
-    'POST /config-update': handleUpdateConfig,
-    'POST /auth': handleAuth,
-    'GET /health': handleHealth
-};
-
-// ========== 默认导出 ==========
+// ========== 路由分发（不使用 new URL） ==========
 export default async function handler(req, res) {
-    const url = new URL(req.url);
-    const path = url.pathname.replace(/^\/api/, '');
-    const key = `${req.method} ${path}`;
+    // 从 req.url 中提取路径部分
+    const urlPath = req.url.split('?')[0];           // 去除查询参数
+    const path = urlPath.replace(/^\/api/, '');      // 移除 /api 前缀
+    const method = req.method;
+    const key = `${method} ${path}`;
+
+    const routes = {
+        'POST /upload': handleUpload,
+        'POST /analyze': handleAnalyze,
+        'GET /task': handleGetTask,
+        'GET /tasks': handleListTasks,
+        'GET /stats': handleStats,
+        'GET /announcement': handleAnnouncement,
+        'GET /config': handleGetConfig,
+        'POST /config-update': handleUpdateConfig,
+        'POST /auth': handleAuth,
+        'GET /health': handleHealth
+    };
 
     const routeHandler = routes[key];
     if (routeHandler) {
