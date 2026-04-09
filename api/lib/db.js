@@ -1,0 +1,6 @@
+const CF_ACCOUNT=process.env.CLOUDFLARE_ACCOUNT_ID,CF_TOKEN=process.env.CLOUDFLARE_API_TOKEN,D1_ID=process.env.D1_DATABASE_ID,BASE=`https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT}/d1/database/${D1_ID}`;
+async function d1Request(sql,params=[],retries=3){for(let i=0;i<retries;i++){try{const r=await fetch(`${BASE}/query`,{method:'POST',headers:{'Authorization':`Bearer ${CF_TOKEN}`,'Content-Type':'application/json'},body:JSON.stringify({sql,params})}),d=await r.json();if(!d.success)throw new Error(d.errors?.[0]?.message||'D1 query failed');return d.result[0]}catch(e){if(i===retries-1)throw e;await new Promise(r=>setTimeout(r,200*(i+1)))}}}
+export async function query(sql,params=[]){return d1Request(sql,params)}
+export async function getConfig(key,def=''){try{const r=await query(`SELECT value FROM configs WHERE key=?`,[key]);return r.results?.length?r.results[0].value:def}catch{return def}}
+export async function setConfig(key,value){const now=Math.floor(Date.now()/1000);await query(`INSERT INTO configs(key,value,updated_at) VALUES (?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at`,[key,value,now])}
+export async function getAllConfigs(){const r=await query(`SELECT key,value FROM configs`);return r.results}
