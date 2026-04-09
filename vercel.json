@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/*.js": {
+    "api/**/*.js": {
       "maxDuration": 300,
       "memory": 1024
     }
@@ -8,7 +8,7 @@
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/admin", "destination": "/web/admin/index.html" },
-    { "source": "/share/(.*)", "destination": "/web/share/index.html" },
+    { "source": "/share/:id", "destination": "/web/share/index.html" },
     { "source": "/(.*)", "destination": "/web/$1" }
   ]
 }
