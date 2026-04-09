@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>内心宇宙 · 分享报告</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="app">
+    <div class="header">
+        <h1>内心宇宙</h1>
+        <div class="sub">一份来自朋友的AI心理画像</div>
+    </div>
+    <div class="card">
+        <div id="shareResultContainer">加载中...</div>
+    </div>
+    <div class="action-buttons">
+        <a href="/" class="btn btn-primary"><i class="fas fa-flask"></i> 我也要分析</a>
+    </div>
+</div>
+<script>
+    const shareId = window.location.pathname.split('/').pop();
+    fetch(`/api/task?id=${shareId}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('shareResultContainer').innerHTML = `<pre>${data.data.result}</pre>`;
+            } else {
+                document.getElementById('shareResultContainer').innerHTML = `<div class="error">报告不存在或已过期</div>`;
+            }
+        })
+        .catch(() => {
+            document.getElementById('shareResultContainer').innerHTML = `<div class="error">加载失败</div>`;
+        });
+</script>
+</body>
+</html>
