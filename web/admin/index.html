@@ -1,0 +1,21 @@
+<!-- 配置卡片 -->
+<div class="card">
+    <h3>⚙️ 系统配置</h3>
+    <label>AI 服务商</label>
+    <select id="cfg_ai_provider">
+        <option value="siliconflow">SiliconFlow</option>
+        <option value="deepseek">DeepSeek</option>
+        <option value="cloudflare">Cloudflare</option>
+    </select>
+    <label>SiliconFlow API Key</label>
+    <input type="password" id="cfg_siliconflow_api_key" placeholder="sk-...">
+    <label>DeepSeek API Key</label>
+    <input type="password" id="cfg_deepseek_api_key" placeholder="sk-...">
+    <label>Cloudflare Account ID</label>
+    <input type="text" id="cfg_cloudflare_account_id">
+    <label>Cloudflare API Token</label>
+    <input type="password" id="cfg_cloudflare_api_token">
+    <label>管理员密钥</label>
+    <input type="text" id="cfg_admin_secret">
+    <button id="saveAllConfigs" class="btn btn-primary">保存所有配置</button>
+</div>
