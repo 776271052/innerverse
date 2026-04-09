@@ -1,0 +1,24 @@
+name = "innerverse-queue-consumer"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+[[queues.consumers]]
+queue = "ai-tasks"
+max_batch_size = 1
+max_batch_timeout = 60
+
+[[d1_databases]]
+binding = "DB"
+database_name = "innerverse-db"
+database_id = "your-d1-id-here"
+
+[[r2_buckets]]
+binding = "IMAGE_BUCKET"
+bucket_name = "innerverse-images"
+
+[ai]
+binding = "AI"
+
+[vars]
+SILICONFLOW_API_KEY = ""    # 建议用 secret 设置
+DEEPSEEK_API_KEY = ""       # 建议用 secret 设置
