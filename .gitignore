@@ -4,3 +4,7 @@ node_modules/
 .DS_Store
 *.log
 .vercel
+vendor/
+config/config.php
+uploads/
+install.lock
