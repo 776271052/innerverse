@@ -1,21 +1,86 @@
-<!-- 配置卡片 -->
-<div class="card">
-    <h3>⚙️ 系统配置</h3>
-    <label>AI 服务商</label>
-    <select id="cfg_ai_provider">
-        <option value="siliconflow">SiliconFlow</option>
-        <option value="deepseek">DeepSeek</option>
-        <option value="cloudflare">Cloudflare</option>
-    </select>
-    <label>SiliconFlow API Key</label>
-    <input type="password" id="cfg_siliconflow_api_key" placeholder="sk-...">
-    <label>DeepSeek API Key</label>
-    <input type="password" id="cfg_deepseek_api_key" placeholder="sk-...">
-    <label>Cloudflare Account ID</label>
-    <input type="text" id="cfg_cloudflare_account_id">
-    <label>Cloudflare API Token</label>
-    <input type="password" id="cfg_cloudflare_api_token">
-    <label>管理员密钥</label>
-    <input type="text" id="cfg_admin_secret">
-    <button id="saveAllConfigs" class="btn btn-primary">保存所有配置</button>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>内心宇宙 · 管理后台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="admin-container">
+    <div id="loginPanel" class="card login-box">
+        <h1><i class="fas fa-lock"></i> 管理员登录</h1>
+        <input type="password" id="adminSecret" placeholder="请输入管理员密钥">
+        <button id="loginBtn" class="btn btn-primary">登录</button>
+        <div id="loginError" class="error"></div>
+    </div>
+
+    <div id="adminPanel" style="display:none;">
+        <div class="header">
+            <h1>内心宇宙 · 管理后台</h1>
+            <button class="btn-outline" onclick="logout()">退出</button>
+        </div>
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="dashboard">📊 仪表盘</button>
+            <button class="tab-btn" data-tab="tasks">📋 任务管理</button>
+            <button class="tab-btn" data-tab="config">⚙️ 系统配置</button>
+        </div>
+        <div id="tab-dashboard" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card"><div>总任务数</div><div class="stat-value" id="totalTasks">-</div></div>
+                <div class="stat-card"><div>成功</div><div class="stat-value" id="successTasks">-</div></div>
+                <div class="stat-card"><div>失败</div><div class="stat-value" id="failedTasks">-</div></div>
+            </div>
+            <div class="card">
+                <h3>近7天趋势</h3>
+                <canvas id="trendChart" height="200"></canvas>
+            </div>
+            <div class="card">
+                <h3>AI 服务商调用分布</h3>
+                <canvas id="providerChart" height="200"></canvas>
+            </div>
+        </div>
+        <div id="tab-tasks" class="tab-content">
+            <div class="filters">
+                <select id="filterStatus"><option value="">全部状态</option><option value="pending">等待中</option><option value="processing">处理中</option><option value="completed">已完成</option><option value="failed">失败</option></select>
+                <select id="filterType"><option value="">全部类型</option><option value="moment">朋友圈</option><option value="chat">聊天</option><option value="htp">房树人</option></select>
+                <input type="text" id="searchTaskId" placeholder="搜索任务ID">
+                <button id="searchTasksBtn">搜索</button>
+            </div>
+            <table class="data-table">
+                <thead><tr><th>ID</th><th>类型</th><th>状态</th><th>服务商</th><th>创建时间</th><th>操作</th></tr></thead>
+                <tbody id="tasksTableBody"></tbody>
+            </table>
+            <div id="tasksPagination" class="pagination"></div>
+        </div>
+        <div id="tab-config" class="tab-content">
+            <div class="card">
+                <h3>AI 服务商配置</h3>
+                <label>当前服务商</label>
+                <select id="cfg_ai_provider">
+                    <option value="siliconflow">SiliconFlow</option>
+                    <option value="deepseek">DeepSeek</option>
+                    <option value="cloudflare">Cloudflare</option>
+                </select>
+                <label>SiliconFlow API Key</label>
+                <input type="password" id="cfg_siliconflow_api_key" placeholder="sk-...">
+                <label>DeepSeek API Key</label>
+                <input type="password" id="cfg_deepseek_api_key" placeholder="sk-...">
+                <label>Cloudflare Account ID</label>
+                <input type="text" id="cfg_cloudflare_account_id">
+                <label>Cloudflare API Token</label>
+                <input type="password" id="cfg_cloudflare_api_token">
+                <label>管理员密钥</label>
+                <input type="text" id="cfg_admin_secret">
+                <label>全站公告</label>
+                <textarea id="cfg_announcement" rows="3" placeholder="支持 HTML"></textarea>
+                <button id="saveAllConfigs" class="btn btn-primary">保存所有配置</button>
+            </div>
+        </div>
+    </div>
 </div>
+<script src="/js/admin.js"></script>
+</body>
+</html>
