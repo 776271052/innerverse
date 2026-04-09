@@ -1,12 +1,12 @@
 {
   "functions": {
-    "api/**/*.js": {
+    "api/index.js": {
       "maxDuration": 300,
       "memory": 1024
     }
   },
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/api/(.*)", "destination": "/api/index" },
     { "source": "/admin", "destination": "/web/admin/index.html" },
     { "source": "/share/:id", "destination": "/web/share/index.html" },
     { "source": "/(.*)", "destination": "/web/$1" }
