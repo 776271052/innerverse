@@ -1,6 +1,7 @@
 {
   "name": "innerverse",
   "version": "4.0.0",
+  "description": "内心宇宙 · AI心理分析平台",
   "scripts": {
     "dev": "vercel dev",
     "deploy": "vercel --prod"
