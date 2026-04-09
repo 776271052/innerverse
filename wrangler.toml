@@ -1,0 +1,12 @@
+name = "innerverse"
+compatibility_date = "2025-01-01"
+
+# Pages 配置（通过 Cloudflare Dashboard 绑定，此文件仅作参考）
+# 实际绑定在 Pages 项目设置中添加：
+# - D1 数据库绑定: DB
+# - R2 存储桶绑定: IMAGE_BUCKET
+# - 队列绑定: AI_TASK_QUEUE
+# - 环境变量: ADMIN_SECRET
+
+[env.production]
+vars = { ADMIN_SECRET = "" }  # 实际值通过 Dashboard 设置
