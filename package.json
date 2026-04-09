@@ -1,6 +1,6 @@
 {
   "name": "innerverse",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "scripts": {
     "dev": "vercel dev",
     "deploy": "vercel --prod"
