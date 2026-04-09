@@ -1,12 +1,7 @@
-import { getAllConfigs } from './lib/db.js';
+import { query } from './lib/db.js';
 import { verifyAdmin } from './lib/auth.js';
-
-export default async function handler(req, res) {
-    if (!verifyAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
-    try {
-        const configs = await getAllConfigs();
-        res.json({ success: true, data: configs });
-    } catch (e) {
-        res.status(500).json({ error: e.message });
-    }
-}
+export default async (req, res) => {
+    if (!await verifyAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
+    const r = await query(`SELECT key, value FROM configs`);
+    res.json({ success: true, data: r.results });
+};
