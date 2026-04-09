@@ -1,19 +1,12 @@
 {
   "name": "innerverse",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "private": true,
   "scripts": {
-    "dev": "vercel dev",
+    "dev": "php -S localhost:8000",
     "deploy": "vercel --prod"
-  },
-  "dependencies": {
-    "@aws-sdk/client-s3": "^3.500.0",
-    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "vercel": "^34.0.0"
-  },
-  "engines": {
-    "node": "20.x"
   }
 }
