@@ -1,19 +1,9 @@
 /**
  * Vercel Serverless Function - AI 分析代理
- * 从 .env 文件读取配置，安全调用 SiliconFlow / DeepSeek / Cloudflare AI
+ * 环境变量直接通过 process.env 读取，无需 dotenv
  */
 
-// 本地开发时加载 .env
-if (process.env.NODE_ENV !== 'production') {
-    try {
-        const dotenv = await import('dotenv');
-        dotenv.config();
-    } catch (e) {
-        console.warn('dotenv not available, skipping .env load');
-    }
-}
-
-export default async function handler(req, res) {
+exports.default = async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ success: false, error: 'Method not allowed' });
     }
@@ -89,4 +79,4 @@ export default async function handler(req, res) {
         console.error('Analyze error:', error);
         return res.status(500).json({ success: false, error: error.message });
     }
-}
+};
