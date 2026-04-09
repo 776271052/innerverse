@@ -1,1 +1,0 @@
-import {getConfig} from './db.js';export async function verifyAdmin(request){const secret=request.headers.get('x-admin-secret')||(request.method==='POST'&&(await request.clone().json().catch(()=>({}))).secret)||new URL(request.url).searchParams.get('secret'),adminSecret=await getConfig('admin_secret','admin123');return secret===adminSecret}
