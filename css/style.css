@@ -1,9 +1,4 @@
-/* ========================================
-   内心宇宙 · 微信风格小清新样式
-   移动端优先，桌面端自适应
-   ======================================== */
-
-/* ----- 全局重置 & 变量 ----- */
+/* ===== 全局重置 & 微信风格变量 ===== */
 * {
     margin: 0;
     padding: 0;
@@ -104,14 +99,8 @@ body {
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(6px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* ----- 首页 Hero ----- */
