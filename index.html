@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>内心宇宙 · 遇见真实的自己</title>
+    <!-- Font Awesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app">
+        <!-- 首页 -->
+        <div id="homePage" class="page active">
+            <div class="hero">
+                <div class="logo-wrapper">
+                    <i class="fas fa-brain logo-icon"></i>
+                </div>
+                <h1 class="app-name">内心宇宙</h1>
+                <p class="slogan">用一幅画，遇见真实的自己</p>
+            </div>
+
+            <div class="feature-section">
+                <div class="feature-card" data-mode="moment">
+                    <div class="card-icon"><i class="fas fa-camera-retro"></i></div>
+                    <div class="card-info">
+                        <h3>朋友圈读心</h3>
+                        <p>上传截图，解读你的MBTI人格</p>
+                    </div>
+                    <i class="fas fa-arrow-right arrow-icon"></i>
+                </div>
+                <div class="feature-card" data-mode="chat">
+                    <div class="card-icon"><i class="fas fa-comments"></i></div>
+                    <div class="card-info">
+                        <h3>聊天风格分析</h3>
+                        <p>看看你在对话中的沟通模式</p>
+                    </div>
+                    <i class="fas fa-arrow-right arrow-icon"></i>
+                </div>
+                <div class="feature-card" data-mode="htp">
+                    <div class="card-icon"><i class="fas fa-paint-brush"></i></div>
+                    <div class="card-info">
+                        <h3>房树人绘画</h3>
+                        <p>画出房子、树木、人物，探索潜意识</p>
+                    </div>
+                    <i class="fas fa-arrow-right arrow-icon"></i>
+                </div>
+            </div>
+
+            <div class="footer-note">
+                <span>💚 每一次探索，都离自己更近一步</span>
+            </div>
+        </div>
+
+        <!-- 上传页面（朋友圈 / 聊天） -->
+        <div id="uploadPage" class="page">
+            <div class="nav-bar">
+                <div class="back-btn" onclick="goBack()"><i class="fas fa-chevron-left"></i></div>
+                <div class="title" id="uploadTitle">朋友圈读心</div>
+                <div class="nav-placeholder"></div>
+            </div>
+            <div class="upload-area" id="uploadArea">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p id="uploadPrompt">点击或拖拽上传截图</p>
+                <small>最多3张，自动优化后上传</small>
+                <input type="file" id="fileInput" accept="image/*" multiple style="display:none;">
+            </div>
+            <div id="filePreview" class="file-list"></div>
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="analyzeUploadBtn" disabled><i class="fas fa-magic"></i>开始分析</button>
+                <button class="btn btn-secondary" id="clearUploadBtn"><i class="fas fa-trash-alt"></i>清空</button>
+            </div>
+            <div id="resultContainer" class="result-card" style="display:none;"></div>
+            <div id="msgContainer"></div>
+        </div>
+
+        <!-- 房树人画板页面 -->
+        <div id="drawPage" class="page">
+            <div class="nav-bar">
+                <div class="back-btn" onclick="goBack()"><i class="fas fa-chevron-left"></i></div>
+                <div class="title">房树人绘画</div>
+                <div class="nav-placeholder"></div>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="drawingCanvas" width="600" height="400"></canvas>
+            </div>
+            <div class="toolbar">
+                <div class="tool-row">
+                    <div class="color-group">
+                        <button class="color-btn active" data-color="#2EBD85"><span class="color-dot" style="background:#2EBD85"></span></button>
+                        <button class="color-btn" data-color="#FF8A80"><span class="color-dot" style="background:#FF8A80"></span></button>
+                        <button class="color-btn" data-color="#82B1FF"><span class="color-dot" style="background:#82B1FF"></span></button>
+                        <button class="color-btn" data-color="#FFD54F"><span class="color-dot" style="background:#FFD54F"></span></button>
+                        <button class="color-btn" data-color="#B388FF"><span class="color-dot" style="background:#B388FF"></span></button>
+                        <button class="color-btn" data-color="#A1887F"><span class="color-dot" style="background:#A1887F"></span></button>
+                        <button class="color-btn" id="customColorBtn" data-color="#000000"><span class="color-dot custom-dot"><i class="fas fa-plus"></i></span></button>
+                        <input type="color" id="colorPicker" style="display:none;">
+                    </div>
+                </div>
+                <div class="tool-row">
+                    <div class="size-group">
+                        <button class="size-btn" data-size="2">细</button>
+                        <button class="size-btn active" data-size="5">中</button>
+                        <button class="size-btn" data-size="10">粗</button>
+                    </div>
+                    <div class="action-group">
+                        <button class="tool-btn" id="eraserBtn" title="橡皮擦"><i class="fas fa-eraser"></i></button>
+                        <button class="tool-btn" id="undoBtn" title="撤销"><i class="fas fa-undo-alt"></i></button>
+                        <button class="tool-btn" id="clearCanvasBtn" title="清空"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="self-desc-section">
+                <div class="self-desc-header">
+                    <span><i class="fas fa-feather-alt"></i>想说的话（可选）</span>
+                    <i class="fas fa-chevron-down" id="toggleDescBtn"></i>
+                </div>
+                <div class="self-desc-body">
+                    <textarea id="selfDescInput" class="self-desc-input" placeholder="这幅画背后的故事…"></textarea>
+                    <div class="char-count"><span id="charCount">0</span>/500</div>
+                </div>
+            </div>
+            <button class="submit-btn" id="analyzeDrawingBtn">完成，开始解读</button>
+        </div>
+    </div>
+
+    <!-- JavaScript 逻辑 -->
+    <script src="js/main.js"></script>
+</body>
+</html>
