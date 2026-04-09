@@ -1,0 +1,17 @@
+{
+  "functions": {
+    "api/*.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/public/$1" }
+  ],
+  "crons": [
+    {
+      "path": "/api/process-task",
+      "schedule": "* * * * *"
+    }
+  ]
+}
