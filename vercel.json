@@ -7,8 +7,8 @@
   },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/index" },
-    { "source": "/admin", "destination": "/web/admin/index.html" },
-    { "source": "/share/:id", "destination": "/web/share/index.html" },
-    { "source": "/(.*)", "destination": "/web/$1" }
+    { "source": "/admin", "destination": "/public/admin/index.html" },
+    { "source": "/share/:id", "destination": "/public/share/index.html" },
+    { "source": "/(.*)", "destination": "/public/$1" }
   ]
 }
