@@ -1,11 +1,17 @@
 /**
  * Vercel Serverless Function - AI 分析代理
- * 从 .env 文件读取配置
+ * 从 .env 文件读取配置，安全调用 SiliconFlow / DeepSeek / Cloudflare AI
  */
-import dotenv from 'dotenv';
 
-// 加载 .env 文件（本地开发用，Vercel 会自动注入）
-dotenv.config();
+// 本地开发时加载 .env
+if (process.env.NODE_ENV !== 'production') {
+    try {
+        const dotenv = await import('dotenv');
+        dotenv.config();
+    } catch (e) {
+        console.warn('dotenv not available, skipping .env load');
+    }
+}
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -22,7 +28,6 @@ export default async function handler(req, res) {
             return res.status(400).json({ success: false, error: '图片数量1-3张' });
         }
 
-        // 从环境变量读取配置
         const provider = process.env.AI_PROVIDER || 'siliconflow';
         const apiKey = process.env[`${provider.toUpperCase()}_API_KEY`];
         if (!apiKey) {
