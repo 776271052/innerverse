@@ -1,6 +1,9 @@
 /**
  * Vercel Serverless Function - AI 分析代理
- * 环境变量直接通过 process.env 读取，无需 dotenv
+ * 支持通过环境变量自定义模型：
+ * - AI_VISION_MODEL: 视觉模型（房树人使用）
+ * - AI_TEXT_MODEL: 文本模型（朋友圈/聊天使用）
+ * 若不设置，则根据 AI_PROVIDER 使用默认模型
  */
 
 exports.default = async function handler(req, res) {
@@ -24,15 +27,28 @@ exports.default = async function handler(req, res) {
             return res.status(500).json({ success: false, error: `未配置 ${provider} API Key` });
         }
 
+        // 自定义模型优先，否则使用服务商默认模型
+        const customVisionModel = process.env.AI_VISION_MODEL;
+        const customTextModel = process.env.AI_TEXT_MODEL;
+
+        let model;
+        if (type === 'htp') {
+            model = customVisionModel || (
+                provider === 'siliconflow' ? 'Qwen/Qwen3-VL-8B-Instruct' :
+                provider === 'deepseek' ? 'deepseek-chat' : '@cf/meta/llama-3.2-11b-vision-instruct'
+            );
+        } else {
+            model = customTextModel || (
+                provider === 'siliconflow' ? 'Qwen/Qwen2.5-7B-Instruct' :
+                provider === 'deepseek' ? 'deepseek-chat' : '@cf/meta/llama-3.2-11b-vision-instruct'
+            );
+        }
+
         const prompts = {
             moment: "你是一位资深心理分析师。请根据朋友圈截图推断MBTI类型，输出格式：1. MBTI类型 2. 各维度评分(E/I,S/N,T/F,J/P) 3. 详细分析(300字) 4. 建议。",
             chat: "你是沟通心理学专家。分析聊天截图：1. 沟通风格 2. 关系推测 3. 情绪特点 4. 改善建议。约300字。",
             htp: "你是房树人绘画分析师。从整体、房子、树木、人物分析心理状态，给出评估与建议。约400字。"
         };
-
-        const model = provider === 'siliconflow'
-            ? (type === 'htp' ? 'Qwen/Qwen3-VL-8B-Instruct' : 'Qwen/Qwen2.5-7B-Instruct')
-            : (provider === 'deepseek' ? 'deepseek-chat' : '@cf/meta/llama-3.2-11b-vision-instruct');
 
         const systemPrompt = prompts[type];
         const userContent = [
