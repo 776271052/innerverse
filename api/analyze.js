@@ -1,9 +1,9 @@
 /**
- * Vercel Serverless Function - AI 分析代理
- * 支持通过环境变量自定义模型：
- * - AI_VISION_MODEL: 视觉模型（房树人使用）
- * - AI_TEXT_MODEL: 文本模型（朋友圈/聊天使用）
- * 若不设置，则根据 AI_PROVIDER 使用默认模型
+ * Vercel Serverless Function - AI 分析代理 (SiliconFlow 专用)
+ * 环境变量：
+ *   SILICONFLOW_API_KEY: 必需
+ *   AI_VISION_MODEL: 可选，房树人使用，默认 Qwen/Qwen3-VL-8B-Instruct
+ *   AI_TEXT_MODEL: 可选，文本使用，默认 Qwen/Qwen2.5-7B-Instruct
  */
 
 exports.default = async function handler(req, res) {
@@ -14,6 +14,7 @@ exports.default = async function handler(req, res) {
     try {
         const { type, images, selfDesc } = req.body;
 
+        // 参数校验
         if (!type || !['moment', 'chat', 'htp'].includes(type)) {
             return res.status(400).json({ success: false, error: '无效分析类型' });
         }
@@ -21,27 +22,21 @@ exports.default = async function handler(req, res) {
             return res.status(400).json({ success: false, error: '图片数量1-3张' });
         }
 
-        const provider = process.env.AI_PROVIDER || 'siliconflow';
-        const apiKey = process.env[`${provider.toUpperCase()}_API_KEY`];
+        // 读取 API Key
+        const apiKey = process.env.SILICONFLOW_API_KEY;
         if (!apiKey) {
-            return res.status(500).json({ success: false, error: `未配置 ${provider} API Key` });
+            return res.status(500).json({
+                success: false,
+                error: '未配置 SILICONFLOW_API_KEY。请在 Vercel 项目设置中添加该环境变量。'
+            });
         }
 
-        // 自定义模型优先，否则使用服务商默认模型
-        const customVisionModel = process.env.AI_VISION_MODEL;
-        const customTextModel = process.env.AI_TEXT_MODEL;
-
+        // 模型选择
         let model;
         if (type === 'htp') {
-            model = customVisionModel || (
-                provider === 'siliconflow' ? 'Qwen/Qwen3-VL-8B-Instruct' :
-                provider === 'deepseek' ? 'deepseek-chat' : '@cf/meta/llama-3.2-11b-vision-instruct'
-            );
+            model = process.env.AI_VISION_MODEL || 'Qwen/Qwen3-VL-8B-Instruct';
         } else {
-            model = customTextModel || (
-                provider === 'siliconflow' ? 'Qwen/Qwen2.5-7B-Instruct' :
-                provider === 'deepseek' ? 'deepseek-chat' : '@cf/meta/llama-3.2-11b-vision-instruct'
-            );
+            model = process.env.AI_TEXT_MODEL || 'Qwen/Qwen2.5-7B-Instruct';
         }
 
         const prompts = {
@@ -60,19 +55,14 @@ exports.default = async function handler(req, res) {
             { role: 'user', content: userContent }
         ];
 
-        let endpoint, requestBody;
-        if (provider === 'siliconflow') {
-            endpoint = 'https://api.siliconflow.cn/v1/chat/completions';
-            requestBody = { model, messages, temperature: 0.7, max_tokens: 1024 };
-        } else if (provider === 'deepseek') {
-            endpoint = 'https://api.deepseek.com/v1/chat/completions';
-            requestBody = { model: 'deepseek-chat', messages, temperature: 0.7, max_tokens: 1024 };
-        } else {
-            endpoint = `https://api.cloudflare.com/client/v4/accounts/${process.env.CF_ACCOUNT_ID}/ai/run/${model}`;
-            requestBody = { messages };
-        }
+        const requestBody = {
+            model,
+            messages,
+            temperature: 0.7,
+            max_tokens: 1024
+        };
 
-        const response = await fetch(endpoint, {
+        const response = await fetch('https://api.siliconflow.cn/v1/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -82,17 +72,24 @@ exports.default = async function handler(req, res) {
         });
 
         const data = await response.json();
+
         if (!response.ok) {
-            throw new Error(data.error?.message || data.message || 'AI 调用失败');
+            const errorDetail = data.error?.message || data.message || JSON.stringify(data);
+            console.error('SiliconFlow API error:', response.status, errorDetail);
+            return res.status(response.status).json({
+                success: false,
+                error: `SiliconFlow 返回错误 (${response.status}): ${errorDetail}`
+            });
         }
 
-        const result = provider === 'cloudflare'
-            ? data.result.response
-            : data.choices[0].message.content;
+        const result = data.choices[0].message.content;
 
         return res.status(200).json({ success: true, result });
     } catch (error) {
         console.error('Analyze error:', error);
-        return res.status(500).json({ success: false, error: error.message });
+        return res.status(500).json({
+            success: false,
+            error: error.message || '未知服务器错误'
+        });
     }
 };
