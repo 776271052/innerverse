@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="description" content="内心宇宙 · 用AI探索真实的自己">
     <title>内心宇宙 · AI心理分析</title>
-    <!-- Font Awesome 图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- 自定义样式 -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -54,7 +52,7 @@
         </div>
     </div>
 
-    <!-- 上传页面（朋友圈/聊天） -->
+    <!-- 上传页面 -->
     <div id="uploadPage" class="page">
         <div class="nav-bar">
             <div class="back-btn" onclick="goBack()"><i class="fas fa-chevron-left"></i></div>
@@ -68,6 +66,16 @@
             <input type="file" id="fileInput" accept="image/*" multiple style="display:none;">
         </div>
         <div id="filePreview" class="file-list"></div>
+
+        <!-- 聊天范围选择 -->
+        <div id="chatScopeWrapper" style="display: none; margin: 0 20px 16px;">
+            <div class="scope-selector">
+                <span class="scope-label">分析范围：</span>
+                <button class="scope-btn active" data-scope="private">💬 私聊</button>
+                <button class="scope-btn" data-scope="group">👥 群聊</button>
+            </div>
+        </div>
+
         <div class="action-buttons">
             <button class="btn btn-primary" id="analyzeUploadBtn" disabled><i class="fas fa-magic"></i>开始分析</button>
             <button class="btn btn-secondary" id="clearUploadBtn"><i class="fas fa-trash-alt"></i>清空</button>
@@ -76,7 +84,7 @@
         <div id="msgContainer"></div>
     </div>
 
-    <!-- 房树人画板页面 -->
+    <!-- 画板页面 -->
     <div id="drawPage" class="page">
         <div class="nav-bar">
             <div class="back-btn" onclick="goBack()"><i class="fas fa-chevron-left"></i></div>
