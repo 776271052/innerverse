@@ -1,54 +1,16 @@
-/**
- * Vercel Serverless Function - AI 分析代理 (SiliconFlow 专用)
- * 环境变量：
- *   SILICONFLOW_API_KEY: 必需
- *   AI_VISION_MODEL: 可选，房树人使用，默认 Qwen/Qwen3-VL-8B-Instruct
- *   AI_TEXT_MODEL: 可选，文本使用，默认 Qwen/Qwen2.5-7B-Instruct
- */
-
 exports.default = async function handler(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({
-            success: false,
-            error: 'Method not allowed'
-        });
-    }
-
+    if (req.method !== 'POST') return res.status(405).json({ success: false, error: 'Method not allowed' });
     try {
-        const {
-            type,
-            images,
-            selfDesc,
-            scope
-        } = req.body;
-
-        if (!type || !['moment', 'chat', 'htp'].includes(type)) {
-            return res.status(400).json({
-                success: false,
-                error: '无效分析类型'
-            });
-        }
-        if (!images || !Array.isArray(images) || images.length === 0 || images.length > 3) {
-            return res.status(400).json({
-                success: false,
-                error: '图片数量1-3张'
-            });
-        }
+        const { type, images, selfDesc, scope } = req.body;
+        if (!type || !['moment', 'chat', 'htp'].includes(type)) return res.status(400).json({ success: false, error: '无效分析类型' });
+        if (!images || !Array.isArray(images) || images.length === 0 || images.length > 3) return res.status(400).json({ success: false, error: '图片数量1-3张' });
 
         const apiKey = process.env.SILICONFLOW_API_KEY;
-        if (!apiKey) {
-            return res.status(500).json({
-                success: false,
-                error: '未配置 SILICONFLOW_API_KEY。请在 Vercel 项目设置中添加该环境变量。'
-            });
-        }
+        if (!apiKey) return res.status(500).json({ success: false, error: '未配置 SILICONFLOW_API_KEY' });
 
         let model;
-        if (type === 'htp') {
-            model = process.env.AI_VISION_MODEL || 'Qwen/Qwen3-VL-8B-Instruct';
-        } else {
-            model = process.env.AI_TEXT_MODEL || 'Qwen/Qwen2.5-7B-Instruct';
-        }
+        if (type === 'htp') model = process.env.AI_VISION_MODEL || 'Qwen/Qwen3-VL-8B-Instruct';
+        else model = process.env.AI_TEXT_MODEL || 'Qwen/Qwen2.5-7B-Instruct';
 
         const prompts = {
             moment: "你是一位资深心理分析师。请根据朋友圈截图推断MBTI类型，输出格式：1. MBTI类型 2. 各维度评分(E/I,S/N,T/F,J/P) 3. 详细分析(300字) 4. 建议。",
@@ -58,68 +20,26 @@ exports.default = async function handler(req, res) {
         };
 
         let systemPrompt;
-        if (type === 'chat') {
-            systemPrompt = scope === 'group' ? prompts.chat_group : prompts.chat_private;
-        } else {
-            systemPrompt = prompts[type];
-        }
+        if (type === 'chat') systemPrompt = scope === 'group' ? prompts.chat_group : prompts.chat_private;
+        else systemPrompt = prompts[type];
 
-        const userContent = [{
-                type: 'text',
-                text: selfDesc ? `用户描述：${selfDesc}` : '请开始分析。'
-            },
-            ...images.map(url => ({
-                type: 'image_url',
-                image_url: {
-                    url
-                }
-            }))
-        ];
-        const messages = [{
-                role: 'system',
-                content: systemPrompt
-            },
-            {
-                role: 'user',
-                content: userContent
-            }
-        ];
+        const userContent = [{ type: 'text', text: selfDesc ? `用户描述：${selfDesc}` : '请开始分析。' }, ...images.map(url => ({ type: 'image_url', image_url: { url } }))];
+        const messages = [{ role: 'system', content: systemPrompt }, { role: 'user', content: userContent }];
 
         const response = await fetch('https://api.siliconflow.cn/v1/chat/completions', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-                model,
-                messages,
-                temperature: 0.7,
-                max_tokens: 1024
-            })
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+            body: JSON.stringify({ model, messages, temperature: 0.7, max_tokens: 1024 })
         });
 
         const data = await response.json();
-
         if (!response.ok) {
-            const errorDetail = data.error?.message || data.message || JSON.stringify(data);
-            console.error('SiliconFlow API error:', response.status, errorDetail);
-            return res.status(response.status).json({
-                success: false,
-                error: `SiliconFlow 返回错误 (${response.status}): ${errorDetail}`
-            });
+            const err = data.error?.message || data.message || JSON.stringify(data);
+            return res.status(response.status).json({ success: false, error: `SiliconFlow 返回错误 (${response.status}): ${err}` });
         }
 
-        const result = data.choices[0].message.content;
-        return res.status(200).json({
-            success: true,
-            result
-        });
+        return res.status(200).json({ success: true, result: data.choices[0].message.content });
     } catch (error) {
-        console.error('Analyze error:', error);
-        return res.status(500).json({
-            success: false,
-            error: error.message || '未知服务器错误'
-        });
+        return res.status(500).json({ success: false, error: error.message });
     }
 };
