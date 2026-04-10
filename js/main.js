@@ -19,27 +19,11 @@ const exportImageBtn = document.getElementById('exportImageBtn');
 
 const progressSteps = ['📤 正在上传图片...', '🔍 AI 正在分析中...', '📝 即将完成...'];
 
-// 维度配色方案
 const colorSchemes = {
-    moment: {
-        E: '#FF9F43', I: '#5A9CFF',
-        S: '#A0785A', N: '#9B6B9E',
-        T: '#26C6DA', F: '#FF8A80',
-        J: '#2E7D32', P: '#FFD54F'
-    },
-    chat_private: {
-        directness: '#FF6B6B', rationality: '#4DABF7',
-        initiative: '#F59F00', closeness: '#FAA2C1'
-    },
-    chat_group: {
-        activity: '#FF9F43', leadership: '#5A9CFF',
-        positivity: '#51CF66', role: '#B0B7FF'
-    },
-    htp: {
-        security: '#2F9E44', family: '#FD7E14',
-        self: '#20C997', growth: '#8CE99A',
-        openness: '#3BC9DB'
-    }
+    moment: { E:'#FF9F43', I:'#5A9CFF', S:'#A0785A', N:'#9B6B9E', T:'#26C6DA', F:'#FF8A80', J:'#2E7D32', P:'#FFD54F' },
+    chat_private: { directness:'#FF6B6B', rationality:'#4DABF7', initiative:'#F59F00', closeness:'#FAA2C1' },
+    chat_group: { activity:'#FF9F43', leadership:'#5A9CFF', positivity:'#51CF66', role:'#B0B7FF' },
+    htp: { security:'#2F9E44', family:'#FD7E14', self:'#20C997', growth:'#8CE99A', openness:'#3BC9DB' }
 };
 
 window.goBack = () => {
@@ -212,11 +196,13 @@ function renderResult(parsedData, rawText) {
     resultContainer.innerHTML = html;
     resultContainer.style.display = 'block';
 
-    for (const [key, value] of Object.entries(dimensions)) {
-        const percent = typeof value === 'number' ? value : parseInt(value) || 50;
-        const canvas = document.getElementById(`canvas-${key}-${Date.now()}`);
-        if (canvas) drawCircularProgress(canvas, percent, colorMap[key] || '#2EBD85');
-    }
+    setTimeout(() => {
+        for (const [key, value] of Object.entries(dimensions)) {
+            const percent = typeof value === 'number' ? value : parseInt(value) || 50;
+            const canvas = document.querySelector(`.dimension-item canvas[data-key="${key}"]`);
+            if (canvas) drawCircularProgress(canvas, percent, colorMap[key] || '#2EBD85');
+        }
+    }, 50);
 
     exportBtnWrapper.style.display = 'block';
 }
@@ -319,7 +305,6 @@ async function exportWithQRCode() {
 }
 exportImageBtn.addEventListener('click', exportWithQRCode);
 
-// 房树人画板（无变化）
 const canvas = document.getElementById('drawingCanvas');
 const ctx = canvas.getContext('2d');
 let drawing = false, eraser = false, lastX, lastY, history = [], MAX_HISTORY = 30;
