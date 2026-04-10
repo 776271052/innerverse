@@ -2,6 +2,7 @@ let currentMode = 'moment';
 let chatScope = 'private';
 const uploadedFiles = [];
 let analyzing = false;
+let currentResultHTML = ''; // 保存结果HTML用于导出
 
 const homePage = document.getElementById('homePage');
 const uploadPage = document.getElementById('uploadPage');
@@ -13,12 +14,10 @@ const analyzeUploadBtn = document.getElementById('analyzeUploadBtn');
 const msgContainer = document.getElementById('msgContainer');
 const resultContainer = document.getElementById('resultContainer');
 const chatScopeWrapper = document.getElementById('chatScopeWrapper');
+const exportBtnWrapper = document.getElementById('exportBtnWrapper');
+const exportImageBtn = document.getElementById('exportImageBtn');
 
-const progressSteps = [
-    '📤 正在上传图片...',
-    '🔍 AI 正在分析中...',
-    '📝 即将完成...'
-];
+const progressSteps = ['📤 正在上传图片...', '🔍 AI 正在分析中...', '📝 即将完成...'];
 
 window.goBack = () => {
     uploadPage.classList.remove('active');
@@ -29,6 +28,7 @@ window.goBack = () => {
     resultContainer.style.display = 'none';
     resultContainer.innerHTML = '';
     msgContainer.innerHTML = '';
+    exportBtnWrapper.style.display = 'none';
 };
 
 document.querySelectorAll('.feature-card').forEach(card => {
@@ -49,6 +49,7 @@ document.querySelectorAll('.feature-card').forEach(card => {
             resultContainer.style.display = 'none';
             resultContainer.innerHTML = '';
             msgContainer.innerHTML = '';
+            exportBtnWrapper.style.display = 'none';
         }
     });
 });
@@ -58,15 +59,19 @@ document.querySelectorAll('.scope-btn').forEach(btn => {
         document.querySelectorAll('.scope-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         chatScope = btn.dataset.scope;
+        uploadedFiles.length = 0;
+        renderFileList();
+        analyzeUploadBtn.disabled = true;
+        resultContainer.style.display = 'none';
+        resultContainer.innerHTML = '';
+        msgContainer.innerHTML = '';
+        exportBtnWrapper.style.display = 'none';
     });
 });
 
 const uploadArea = document.getElementById('uploadArea');
 uploadArea.addEventListener('click', () => fileInput.click());
-uploadArea.addEventListener('dragover', e => {
-    e.preventDefault();
-    uploadArea.style.background = '#F0FDF4';
-});
+uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.style.background = '#F0FDF4'; });
 uploadArea.addEventListener('dragleave', () => uploadArea.style.background = '');
 uploadArea.addEventListener('drop', e => {
     e.preventDefault();
@@ -80,14 +85,8 @@ fileInput.addEventListener('change', e => {
 
 function addFiles(files) {
     for (const f of files) {
-        if (uploadedFiles.length >= 3) {
-            alert('最多3张');
-            break;
-        }
-        if (f.size > 10 * 1024 * 1024) {
-            alert('图片不超过10MB');
-            continue;
-        }
+        if (uploadedFiles.length >= 3) { alert('最多3张'); break; }
+        if (f.size > 10 * 1024 * 1024) { alert('图片不超过10MB'); continue; }
         uploadedFiles.push(f);
     }
     renderFileList();
@@ -102,17 +101,8 @@ function renderFileList() {
         </div>
     `).join('');
 }
-window.removeFile = i => {
-    uploadedFiles.splice(i, 1);
-    renderFileList();
-    analyzeUploadBtn.disabled = uploadedFiles.length === 0;
-};
-
-document.getElementById('clearUploadBtn').addEventListener('click', () => {
-    uploadedFiles.length = 0;
-    renderFileList();
-    analyzeUploadBtn.disabled = true;
-});
+window.removeFile = i => { uploadedFiles.splice(i, 1); renderFileList(); analyzeUploadBtn.disabled = uploadedFiles.length === 0; };
+document.getElementById('clearUploadBtn').addEventListener('click', () => { uploadedFiles.length = 0; renderFileList(); analyzeUploadBtn.disabled = true; });
 
 async function compressImage(file) {
     return new Promise(r => {
@@ -121,18 +111,11 @@ async function compressImage(file) {
             const img = new Image();
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                let w = img.width,
-                    h = img.height;
-                if (w > 1200) {
-                    h = h * 1200 / w;
-                    w = 1200;
-                }
-                canvas.width = w;
-                canvas.height = h;
+                let w = img.width, h = img.height;
+                if (w > 1200) { h = h * 1200 / w; w = 1200; }
+                canvas.width = w; canvas.height = h;
                 canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                canvas.toBlob(b => r(new File([b], file.name, {
-                    type: 'image/jpeg'
-                })), 'image/jpeg', 0.8);
+                canvas.toBlob(b => r(new File([b], file.name, { type: 'image/jpeg' })), 'image/jpeg', 0.8);
             };
             img.src = e.target.result;
         };
@@ -171,20 +154,12 @@ async function submitAnalysis(type, imageBase64Array, selfDesc = '') {
     }, 2000);
 
     try {
-        const payload = {
-            type,
-            images: imageBase64Array,
-            selfDesc
-        };
-        if (type === 'chat') {
-            payload.scope = chatScope;
-        }
+        const payload = { type, images: imageBase64Array, selfDesc };
+        if (type === 'chat') payload.scope = chatScope;
 
         const res = await fetch('/api/analyze', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
         clearInterval(progressInterval);
@@ -192,16 +167,14 @@ async function submitAnalysis(type, imageBase64Array, selfDesc = '') {
         if (!data.success) throw new Error(data.error);
 
         msgContainer.innerHTML = '';
+        const resultHTML = `<pre>${data.result}</pre>`;
+        resultContainer.innerHTML = resultHTML;
+        currentResultHTML = resultHTML;
         resultContainer.style.display = 'block';
-        resultContainer.innerHTML = `<pre>${data.result}</pre>`;
+        exportBtnWrapper.style.display = 'block';
     } catch (e) {
         clearInterval(progressInterval);
-        msgContainer.innerHTML = `
-            <div class="msg msg-error">
-                <i class="fas fa-exclamation-circle"></i>
-                <span>${e.message}</span>
-            </div>
-        `;
+        msgContainer.innerHTML = `<div class="msg msg-error"><i class="fas fa-exclamation-circle"></i><span>${e.message}</span></div>`;
     } finally {
         analyzing = false;
     }
@@ -215,66 +188,95 @@ analyzeUploadBtn.addEventListener('click', async () => {
             const b64 = await fileToBase64(c);
             base64Array.push(b64);
         } catch (e) {
-            msgContainer.innerHTML = `
-                <div class="msg msg-error">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <span>${e.message}</span>
-                </div>
-            `;
+            msgContainer.innerHTML = `<div class="msg msg-error"><i class="fas fa-exclamation-circle"></i><span>${e.message}</span></div>`;
             return;
         }
     }
     submitAnalysis(currentMode, base64Array);
 });
 
-const canvas = document.getElementById('drawingCanvas');
-const ctx = canvas.getContext('2d');
-let drawing = false,
-    eraser = false,
-    lastX, lastY,
-    history = [],
-    MAX_HISTORY = 30;
-
-function initCanvas() {
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    history = [];
-    saveState();
-}
-
-function saveState() {
-    history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
-    if (history.length > MAX_HISTORY) history.shift();
-}
-
-function undo() {
-    if (history.length > 1) {
-        history.pop();
-        ctx.putImageData(history[history.length - 1], 0, 0);
+// 导出图片（带二维码）
+async function exportWithQRCode() {
+    if (!resultContainer) return;
+    const originalDisplay = resultContainer.style.display;
+    resultContainer.style.display = 'block';
+    
+    try {
+        // 1. 截图结果区域
+        const canvas = await html2canvas(resultContainer, {
+            scale: 2,
+            backgroundColor: '#FFFFFF',
+            allowTaint: false,
+            useCNAME: true
+        });
+        
+        // 2. 生成二维码
+        const qr = qrcode(0, 'M');
+        qr.addData('https://innerverse.776271052.xyz/');
+        qr.make();
+        const qrSize = 100;
+        const qrDataURL = qr.createDataURL(10, 0);
+        
+        // 3. 创建最终画布
+        const finalCanvas = document.createElement('canvas');
+        const ctx = finalCanvas.getContext('2d');
+        finalCanvas.width = canvas.width;
+        finalCanvas.height = canvas.height;
+        
+        // 绘制截图
+        ctx.drawImage(canvas, 0, 0);
+        
+        // 4. 绘制二维码（右下角）
+        const qrImg = new Image();
+        await new Promise(resolve => { qrImg.onload = resolve; qrImg.src = qrDataURL; });
+        const padding = 20;
+        const qrX = finalCanvas.width - qrSize - padding;
+        const qrY = finalCanvas.height - qrSize - padding;
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16);
+        ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+        
+        // 5. 添加提示文字
+        ctx.font = '12px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.fillStyle = '#2C3E50';
+        ctx.textAlign = 'right';
+        ctx.fillText('扫码访问网站', qrX + qrSize/2, qrY - 10);
+        
+        // 6. 下载
+        const link = document.createElement('a');
+        link.download = `innerverse-${Date.now()}.png`;
+        link.href = finalCanvas.toDataURL('image/png');
+        link.click();
+    } catch (e) {
+        alert('导出失败: ' + e.message);
+    } finally {
+        resultContainer.style.display = originalDisplay;
     }
 }
 
+exportImageBtn.addEventListener('click', exportWithQRCode);
+
+// 房树人画板
+const canvas = document.getElementById('drawingCanvas');
+const ctx = canvas.getContext('2d');
+let drawing = false, eraser = false, lastX, lastY, history = [], MAX_HISTORY = 30;
+
+function initCanvas() { ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, canvas.width, canvas.height); history = []; saveState(); }
+function saveState() { history.push(ctx.getImageData(0, 0, canvas.width, canvas.height)); if (history.length > MAX_HISTORY) history.shift(); }
+function undo() { if (history.length > 1) { history.pop(); ctx.putImageData(history[history.length - 1], 0, 0); } }
+
 function getCoords(e) {
     const rect = canvas.getBoundingClientRect();
-    const sx = canvas.width / rect.width,
-        sy = canvas.height / rect.height;
+    const sx = canvas.width / rect.width, sy = canvas.height / rect.height;
     const cx = e.touches ? e.touches[0].clientX : e.clientX;
     const cy = e.touches ? e.touches[0].clientY : e.clientY;
-    return {
-        x: Math.min(canvas.width, Math.max(0, (cx - rect.left) * sx)),
-        y: Math.min(canvas.height, Math.max(0, (cy - rect.top) * sy))
-    };
+    return { x: Math.min(canvas.width, Math.max(0, (cx - rect.left) * sx)), y: Math.min(canvas.height, Math.max(0, (cy - rect.top) * sy)) };
 }
 
 function startDraw(e) {
     e.preventDefault();
-    const {
-        x,
-        y
-    } = getCoords(e);
-    drawing = true;
-    lastX = x;
-    lastY = y;
+    const { x, y } = getCoords(e);
+    drawing = true; lastX = x; lastY = y;
     saveState();
     if (!eraser) {
         ctx.beginPath();
@@ -283,14 +285,10 @@ function startDraw(e) {
         ctx.fill();
     }
 }
-
 function draw(e) {
     e.preventDefault();
     if (!drawing) return;
-    const {
-        x,
-        y
-    } = getCoords(e);
+    const { x, y } = getCoords(e);
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(x, y);
@@ -298,14 +296,9 @@ function draw(e) {
     ctx.lineWidth = parseInt(document.querySelector('.size-btn.active').dataset.size);
     ctx.lineCap = 'round';
     ctx.stroke();
-    lastX = x;
-    lastY = y;
+    lastX = x; lastY = y;
 }
-
-function endDraw(e) {
-    e.preventDefault();
-    drawing = false;
-}
+function endDraw(e) { e.preventDefault(); drawing = false; }
 
 canvas.addEventListener('pointerdown', startDraw);
 canvas.addEventListener('pointermove', draw);
@@ -322,26 +315,16 @@ document.querySelectorAll('.size-btn').forEach(b => b.addEventListener('click', 
     document.querySelectorAll('.size-btn').forEach(s => s.classList.remove('active'));
     this.classList.add('active');
 }));
-document.getElementById('eraserBtn').addEventListener('click', function() {
-    eraser = !eraser;
-    this.classList.toggle('active', eraser);
-});
+document.getElementById('eraserBtn').addEventListener('click', function() { eraser = !eraser; this.classList.toggle('active', eraser); });
 document.getElementById('undoBtn').addEventListener('click', undo);
-document.getElementById('clearCanvasBtn').addEventListener('click', () => {
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    history = [];
-    saveState();
-});
+document.getElementById('clearCanvasBtn').addEventListener('click', () => { ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, canvas.width, canvas.height); history = []; saveState(); });
 
 document.getElementById('analyzeDrawingBtn').addEventListener('click', () => {
-    const dataURL = canvas.toDataURL('image/png');
+    const dataURL = canvas.toDataURL('image/jpeg', 0.7);
     submitAnalysis('htp', [dataURL], document.getElementById('selfDescInput').value);
 });
 
-document.getElementById('selfDescInput').addEventListener('input', e => {
-    document.getElementById('charCount').textContent = e.target.value.length;
-});
+document.getElementById('selfDescInput').addEventListener('input', e => { document.getElementById('charCount').textContent = e.target.value.length; });
 
 const customColorBtn = document.getElementById('customColorBtn');
 const colorPicker = document.getElementById('colorPicker');
