@@ -2,7 +2,6 @@ let currentMode = 'moment';
 let chatScope = 'private';
 const uploadedFiles = [];
 let analyzing = false;
-let currentResultData = null;
 
 const homePage = document.getElementById('homePage');
 const uploadPage = document.getElementById('uploadPage');
@@ -16,6 +15,7 @@ const resultContainer = document.getElementById('resultContainer');
 const chatScopeWrapper = document.getElementById('chatScopeWrapper');
 const exportBtnWrapper = document.getElementById('exportBtnWrapper');
 const exportImageBtn = document.getElementById('exportImageBtn');
+const exportCaptureArea = document.getElementById('exportCaptureArea');
 
 const progressSteps = ['📤 正在上传图片...', '🔍 AI 正在分析中...', '📝 即将完成...'];
 
@@ -150,6 +150,7 @@ function updateProgressMessage(stepIndex) {
 }
 
 function drawCircularProgress(canvas, percent, color) {
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const w = canvas.width, h = canvas.height;
     ctx.clearRect(0, 0, w, h);
@@ -179,10 +180,12 @@ function renderResult(parsedData, rawText) {
     if (type === 'chat') colorMap = chatScope === 'group' ? colorSchemes.chat_group : colorSchemes.chat_private;
 
     let html = '<div class="dimensions-grid">';
+    const canvasIds = [];
     for (const [key, value] of Object.entries(dimensions)) {
         const percent = typeof value === 'number' ? value : parseInt(value) || 50;
         const color = colorMap[key] || '#2EBD85';
-        const canvasId = `canvas-${key}-${Date.now()}-${Math.random()}`;
+        const canvasId = `canvas-${key}-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
+        canvasIds.push({ id: canvasId, percent, color });
         html += `<div class="dimension-item">`;
         html += `<canvas class="dimension-canvas" id="${canvasId}" width="100" height="100"></canvas>`;
         html += `<div class="dimension-label">${key}</div>`;
@@ -196,13 +199,10 @@ function renderResult(parsedData, rawText) {
     resultContainer.innerHTML = html;
     resultContainer.style.display = 'block';
 
-    setTimeout(() => {
-        for (const [key, value] of Object.entries(dimensions)) {
-            const percent = typeof value === 'number' ? value : parseInt(value) || 50;
-            const canvas = document.querySelector(`.dimension-item canvas[data-key="${key}"]`);
-            if (canvas) drawCircularProgress(canvas, percent, colorMap[key] || '#2EBD85');
-        }
-    }, 50);
+    canvasIds.forEach(({ id, percent, color }) => {
+        const canvas = document.getElementById(id);
+        if (canvas) drawCircularProgress(canvas, percent, color);
+    });
 
     exportBtnWrapper.style.display = 'block';
 }
@@ -239,7 +239,6 @@ async function submitAnalysis(type, imageBase64Array, selfDesc = '') {
             if (jsonMatch) parsedData = JSON.parse(jsonMatch[1] || jsonMatch[0]);
         } catch (e) {}
 
-        currentResultData = { parsedData, rawText };
         renderResult(parsedData, rawText);
     } catch (e) {
         clearInterval(progressInterval);
@@ -265,46 +264,66 @@ analyzeUploadBtn.addEventListener('click', async () => {
 });
 
 async function exportWithQRCode() {
-    if (!resultContainer) return;
-    const wrapper = resultContainer;
-    const originalBorderRadius = wrapper.style.borderRadius;
-    wrapper.style.borderRadius = '28px';
+    if (!exportCaptureArea) return;
     try {
-        const canvas = await html2canvas(wrapper, { scale: 2, backgroundColor: '#FFFFFF', allowTaint: false, useCNAME: true });
+        // 高清截图：提高scale，优化文字渲染
+        const canvas = await html2canvas(exportCaptureArea, {
+            scale: 3,
+            backgroundColor: '#F5F7FA',
+            allowTaint: false,
+            useCNAME: true,
+            logging: false
+        });
+        
         const qr = qrcode(0, 'M');
         qr.addData('https://innerverse.776271052.xyz/');
         qr.make();
-        const qrSize = 120;
-        const qrDataURL = qr.createDataURL(10, 0);
+        const qrSize = 140;
+        const qrDataURL = qr.createDataURL(12, 0);
+        
         const finalCanvas = document.createElement('canvas');
         const ctx = finalCanvas.getContext('2d');
         finalCanvas.width = canvas.width;
         finalCanvas.height = canvas.height;
+        
+        // 绘制高清截图
         ctx.drawImage(canvas, 0, 0);
+        
+        // 绘制二维码
         const qrImg = new Image();
         await new Promise(resolve => { qrImg.onload = resolve; qrImg.src = qrDataURL; });
-        const padding = 24;
+        const padding = 30;
         const qrX = finalCanvas.width - qrSize - padding;
         const qrY = finalCanvas.height - qrSize - padding;
+        
+        // 白色背景
         ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20);
+        ctx.shadowColor = 'rgba(0,0,0,0.1)';
+        ctx.shadowBlur = 16;
+        ctx.fillRect(qrX - 12, qrY - 12, qrSize + 24, qrSize + 24);
+        ctx.shadowColor = 'transparent';
+        
+        // 二维码
         ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
-        ctx.font = '14px -apple-system, BlinkMacSystemFont, sans-serif';
+        
+        // 提示文字
+        ctx.font = '500 16px -apple-system, BlinkMacSystemFont, sans-serif';
         ctx.fillStyle = '#2C3E50';
         ctx.textAlign = 'right';
-        ctx.fillText('扫码访问网站', qrX + qrSize/2, qrY - 12);
+        ctx.fillText('扫码访问网站', qrX + qrSize/2, qrY - 16);
+        
+        // 下载
         const link = document.createElement('a');
         link.download = `innerverse-${Date.now()}.png`;
         link.href = finalCanvas.toDataURL('image/png');
         link.click();
     } catch (e) {
         alert('导出失败: ' + e.message);
-    } finally {
-        wrapper.style.borderRadius = originalBorderRadius;
     }
 }
 exportImageBtn.addEventListener('click', exportWithQRCode);
 
+// 房树人画板
 const canvas = document.getElementById('drawingCanvas');
 const ctx = canvas.getContext('2d');
 let drawing = false, eraser = false, lastX, lastY, history = [], MAX_HISTORY = 30;
