@@ -15,43 +15,28 @@
     <!-- 首页 -->
     <div id="homePage" class="page active">
         <div class="hero">
-            <div class="logo-wrapper">
-                <i class="fas fa-brain logo-icon"></i>
-            </div>
+            <div class="logo-wrapper"><i class="fas fa-brain logo-icon"></i></div>
             <h1 class="app-name">内心宇宙</h1>
             <p class="slogan">用一幅画，遇见真实的自己</p>
         </div>
-
         <div class="feature-section">
             <div class="feature-card" data-mode="moment">
                 <div class="card-icon"><i class="fas fa-camera-retro"></i></div>
-                <div class="card-info">
-                    <h3>朋友圈读心</h3>
-                    <p>上传截图，解读你的MBTI人格</p>
-                </div>
+                <div class="card-info"><h3>朋友圈读心</h3><p>上传截图，解读你的MBTI人格</p></div>
                 <i class="fas fa-arrow-right arrow-icon"></i>
             </div>
             <div class="feature-card" data-mode="chat">
                 <div class="card-icon"><i class="fas fa-comments"></i></div>
-                <div class="card-info">
-                    <h3>聊天风格分析</h3>
-                    <p>看看你在对话中的沟通模式</p>
-                </div>
+                <div class="card-info"><h3>聊天风格分析</h3><p>看看你在对话中的沟通模式</p></div>
                 <i class="fas fa-arrow-right arrow-icon"></i>
             </div>
             <div class="feature-card" data-mode="htp">
                 <div class="card-icon"><i class="fas fa-paint-brush"></i></div>
-                <div class="card-info">
-                    <h3>房树人绘画</h3>
-                    <p>画出房子、树木、人物，探索潜意识</p>
-                </div>
+                <div class="card-info"><h3>房树人绘画</h3><p>画出房子、树木、人物，探索潜意识</p></div>
                 <i class="fas fa-arrow-right arrow-icon"></i>
             </div>
         </div>
-
-        <div class="footer-note">
-            <span>💚 每一次探索，都离自己更近一步</span>
-        </div>
+        <div class="footer-note"><span>💚 每一次探索，都离自己更近一步</span></div>
     </div>
 
     <!-- 上传页面 -->
@@ -68,7 +53,6 @@
             <input type="file" id="fileInput" accept="image/*" multiple style="display:none;">
         </div>
         <div id="filePreview" class="file-list"></div>
-
         <div id="chatScopeWrapper" style="display: none; margin: 0 20px 16px;">
             <div class="scope-selector">
                 <span class="scope-label">分析范围：</span>
@@ -76,14 +60,16 @@
                 <button class="scope-btn" data-scope="group">👥 群聊</button>
             </div>
         </div>
-
         <div class="action-buttons">
             <button class="btn btn-primary" id="analyzeUploadBtn" disabled><i class="fas fa-magic"></i>开始分析</button>
             <button class="btn btn-secondary" id="clearUploadBtn"><i class="fas fa-trash-alt"></i>清空</button>
         </div>
-        <div id="resultContainer" class="result-card" style="display:none;"></div>
-        <div style="margin: 0 20px 20px; display: none;" id="exportBtnWrapper">
-            <button class="btn btn-outline" id="exportImageBtn"><i class="fas fa-download"></i> 导出图片（带二维码）</button>
+        <!-- 截图区域：包含结果卡片和导出按钮 -->
+        <div id="exportCaptureArea" style="background: transparent;">
+            <div id="resultContainer" class="result-card" style="display:none;"></div>
+            <div style="margin: 0 20px 20px; display: none;" id="exportBtnWrapper">
+                <button class="btn btn-outline" id="exportImageBtn"><i class="fas fa-download"></i> 导出图片（带二维码）</button>
+            </div>
         </div>
         <div id="msgContainer"></div>
     </div>
