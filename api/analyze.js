@@ -13,10 +13,10 @@ exports.default = async function handler(req, res) {
         else model = process.env.AI_TEXT_MODEL || 'Qwen/Qwen2.5-7B-Instruct';
 
         const prompts = {
-            moment: "你是一位资深心理分析师。请根据朋友圈截图推断MBTI类型，输出格式：1. MBTI类型 2. 各维度评分(E/I,S/N,T/F,J/P) 3. 详细分析(300字) 4. 建议。",
-            chat_private: "你是一位沟通心理学专家。请分析这段私聊对话截图，聚焦于用户本人的沟通风格：1. 直接/委婉程度 2. 理性/感性倾向 3. 主动/被动性 4. 与对方的关系亲密度推测 5. 情绪表达特点 6. 改善沟通的建议。约300字。",
-            chat_group: "你是一位群体沟通心理学专家。请分析这段群聊截图，聚焦于用户本人在群体中的互动模式：1. 发言活跃度 2. 话题引导力 3. 情绪感染力 4. 群体角色 5. 改善群体融入的建议。约300字。",
-            htp: "你是房树人绘画分析师。从整体、房子、树木、人物分析心理状态，给出评估与建议。约400字。"
+            moment: "你是一位资深心理分析师。请根据朋友圈截图推断MBTI类型，并在报告末尾附上一个JSON代码块，包含维度评分(0-100)和MBTI类型。格式示例：```json\n{\"type\":\"moment\",\"dimensions\":{\"E\":65,\"I\":35,\"S\":48,\"N\":52,\"T\":70,\"F\":30,\"J\":55,\"P\":45},\"mbtiType\":\"ENTJ\"}\n```",
+            chat_private: "你是一位沟通心理学专家。分析私聊截图，末尾附JSON：```json\n{\"type\":\"chat_private\",\"dimensions\":{\"directness\":65,\"rationality\":70,\"initiative\":55,\"closeness\":60}}\n```",
+            chat_group: "你是一位群体沟通心理学专家。分析群聊截图，末尾附JSON：```json\n{\"type\":\"chat_group\",\"dimensions\":{\"activity\":70,\"leadership\":45,\"positivity\":80},\"role\":\"意见领袖\"}\n```",
+            htp: "你是房树人绘画分析师。分析绘画，末尾附JSON：```json\n{\"type\":\"htp\",\"dimensions\":{\"security\":60,\"family\":70,\"self\":55,\"growth\":65,\"openness\":50}}\n```"
         };
 
         let systemPrompt;
