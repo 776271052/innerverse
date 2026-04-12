@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { Upload, X, Heart, Sparkles, LogOut } from 'lucide-react'
+import { Upload, X, Heart, Sparkles, LogIn, LogOut } from 'lucide-react'
 import { toast } from 'sonner'
 import UploadZone from '@/components/UploadZone'
 import AnalysisResult from '@/components/AnalysisResult'
@@ -41,8 +41,8 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: selectedType,
-          images: images,
-          selfDesc: selfDesc,
+          images,
+          selfDesc,
           scope: 'private'
         })
       })
@@ -51,13 +51,12 @@ export default function Home() {
 
       if (data.success) {
         setAnalysisResult(data.result)
-        toast.success('AI 已温柔地解析完成 ✨')
+        toast.success('AI 已温柔解析完成 ✨')
       } else {
-        toast.error(data.error || '分析失败，请重试')
+        toast.error(data.error || '分析失败')
       }
     } catch (error) {
-      console.error(error)
-      toast.error('请求失败，请检查网络')
+      toast.error('请求失败，请稍后再试')
     } finally {
       setIsLoading(false)
     }
@@ -66,7 +65,6 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pastel-pink via-pastel-purple to-pastel-mint dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       <div className="max-w-6xl mx-auto px-6 py-12">
-        {/* Header */}
         <motion.header 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -80,23 +78,28 @@ export default function Home() {
             </div>
           </div>
 
-          {user && (
-            <button 
-              onClick={() => {
-                localStorage.removeItem('auth_token')
-                window.location.reload()
-              }}
-              className="flex items-center gap-2 px-4 py-2 rounded-2xl hover:bg-white/50 dark:hover:bg-white/10 transition"
-            >
-              <LogOut size={18} /> 退出
-            </button>
-          )}
+          <div className="flex items-center gap-4">
+            {!user ? (
+              <a href="/login" className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-white/70 hover:bg-white dark:bg-slate-800 dark:hover:bg-slate-700 transition">
+                <LogIn size={18} /> 管理员登录
+              </a>
+            ) : (
+              <button 
+                onClick={() => {
+                  localStorage.removeItem('auth_token')
+                  window.location.reload()
+                }}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-2xl hover:bg-white/70 dark:hover:bg-slate-700 transition"
+              >
+                <LogOut size={18} /> 退出
+              </button>
+            )}
+          </div>
         </motion.header>
 
         <UploadZone images={images} setImages={setImages} />
 
-        {/* 分析类型选择 */}
-        <div className="flex gap-4 mt-8 justify-center">
+        <div className="flex gap-4 mt-8 justify-center flex-wrap">
           {['moment', 'mbti', 'emotion', 'painting'].map((type) => (
             <button
               key={type}
@@ -120,18 +123,12 @@ export default function Home() {
           whileTap={{ scale: 0.98 }}
           onClick={handleSubmit}
           disabled={isLoading || images.length === 0}
-          className="mt-10 w-full py-8 text-2xl font-medium bg-gradient-to-r from-pastel-rose via-violet-500 to-purple-500 text-white rounded-3xl shadow-2xl flex items-center justify-center gap-4 disabled:cursor-not-allowed disabled:opacity-70"
+          className="mt-10 w-full py-8 text-2xl font-medium bg-gradient-to-r from-pastel-rose via-violet-500 to-purple-500 text-white rounded-3xl shadow-2xl flex items-center justify-center gap-4 disabled:opacity-70"
         >
-          {isLoading ? (
-            <>AI 正在温柔解析你的内心… 🌸</>
-          ) : (
-            <>开始内心宇宙分析 ✨</>
-          )}
+          {isLoading ? 'AI 正在温柔解析你的内心… 🌸' : '开始内心宇宙分析 ✨'}
         </motion.button>
 
-        {analysisResult && (
-          <AnalysisResult result={analysisResult} images={images} />
-        )}
+        {analysisResult && <AnalysisResult result={analysisResult} images={images} />}
       </div>
     </div>
   )
