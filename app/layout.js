@@ -6,19 +6,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <body>
-        <ThemeProvider 
-          attribute="class" 
-          defaultTheme="light" 
-          enableSystem
-          disableTransitionOnChange
-        >
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           {children}
-          <Toaster 
-            position="top-center" 
-            richColors 
-            closeButton 
-            duration={3000}
-          />
+          <Toaster position="top-center" richColors closeButton />
         </ThemeProvider>
       </body>
     </html>
