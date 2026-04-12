@@ -1,27 +1,19 @@
 {
   "name": "innerverse",
   "version": "2.0.0",
-  "description": "内心宇宙 · AI心理分析应用",
-  "main": "index.html",
+  "description": "内心宇宙 - AI心理分析与成长平台",
+  "main": "index.js",
   "scripts": {
     "dev": "vercel dev",
-    "build": "echo \"无需构建\"",
-    "start": "echo \"使用Vercel部署\""
+    "build": "npm run build:client",
+    "start": "node server.js"
   },
-  "keywords": [
-    "ai",
-    "psychology",
-    "mbti",
-    "analysis",
-    "pwa"
-  ],
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3"
+  },
+  "keywords": ["psychology", "ai", "mental health", "wellness"],
   "author": "InnerVerse Team",
-  "license": "MIT",
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "dependencies": {},
-  "devDependencies": {
-    "vercel": "^34.0.0"
-  }
+  "license": "MIT"
 }
