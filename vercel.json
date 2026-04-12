@@ -1,21 +1,12 @@
 {
-  "version": 2,
-  "name": "innerverse",
-  "builds": [
-    {
-      "src": "api/analyze.js",
-      "use": "@vercel/node"
+  "functions": {
+    "api/analyze.js": {
+      "maxDuration": 60,
+      "memory": 1024
     }
-  ],
-  "routes": [
-    {
-      "src": "/api/analyze",
-      "dest": "api/analyze.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" }
   ],
   "headers": [
     {
@@ -32,27 +23,8 @@
         {
           "key": "X-XSS-Protection",
           "value": "1; mode=block"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
         }
       ]
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    }
-  ],
-  "images": {
-    "domains": [],
-    "minimumCacheTTL": 31536000,
-    "formats": ["image/avif", "image/webp"],
-    "sizes": [320, 640, 1024, 1200]
-  },
-  "github": {
-    "silent": true
-  }
+  ]
 }
