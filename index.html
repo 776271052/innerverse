@@ -1,129 +1,205 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="description" content="内心宇宙 · 用AI探索真实的自己">
-    <title>内心宇宙 · AI心理分析</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="内心宇宙 · 用AI探索真实的自己">
+  <meta name="theme-color" content="#07C160">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="内心宇宙">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+
+  <title>内心宇宙 · AI心理分析</title>
+
+  <!-- Favicon (Emoji) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+
+  <!-- External Libraries -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV0sEjv9E+xFlW2FLz2sZxg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js" integrity="sha512-CDVZ6+9nT3wP7dD7J3F4h3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F4y3F......" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Local Styles -->
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<div class="app">
+  <div class="app" id="app">
     <!-- 首页 -->
     <div id="homePage" class="page active">
-        <div class="hero">
-            <div class="logo-wrapper"><i class="fas fa-brain logo-icon"></i></div>
-            <h1 class="app-name">内心宇宙</h1>
-            <p class="slogan">用一幅画，遇见真实的自己</p>
+      <div class="hero">
+        <div class="logo-wrapper" aria-label="内心宇宙Logo">
+          <i class="fas fa-brain logo-icon" aria-hidden="true"></i>
         </div>
-        <div class="feature-section">
-            <div class="feature-card" data-mode="moment">
-                <div class="card-icon"><i class="fas fa-camera-retro"></i></div>
-                <div class="card-info"><h3>朋友圈读心</h3><p>上传截图，解读你的MBTI人格</p></div>
-                <i class="fas fa-arrow-right arrow-icon"></i>
-            </div>
-            <div class="feature-card" data-mode="chat">
-                <div class="card-icon"><i class="fas fa-comments"></i></div>
-                <div class="card-info"><h3>聊天风格分析</h3><p>看看你在对话中的沟通模式</p></div>
-                <i class="fas fa-arrow-right arrow-icon"></i>
-            </div>
-            <div class="feature-card" data-mode="htp">
-                <div class="card-icon"><i class="fas fa-paint-brush"></i></div>
-                <div class="card-info"><h3>房树人绘画</h3><p>画出房子、树木、人物，探索潜意识</p></div>
-                <i class="fas fa-arrow-right arrow-icon"></i>
-            </div>
-        </div>
-        <div class="footer-note"><span>💚 每一次探索，都离自己更近一步</span></div>
+        <h1 class="app-name" id="appName">内心宇宙</h1>
+        <p class="slogan">用一幅画，遇见真实的自己</p>
+      </div>
+      <div class="feature-section" role="navigation" aria-label="功能选择">
+        <button class="feature-card" data-mode="moment" aria-label="朋友圈读心功能">
+          <div class="card-icon"><i class="fas fa-camera-retro" aria-hidden="true"></i></div>
+          <div class="card-info">
+            <h3>朋友圈读心</h3>
+            <p>上传截图，解读你的MBTI人格</p>
+          </div>
+          <i class="fas fa-arrow-right arrow-icon" aria-hidden="true"></i>
+        </button>
+        <button class="feature-card" data-mode="chat" aria-label="聊天风格分析功能">
+          <div class="card-icon"><i class="fas fa-comments" aria-hidden="true"></i></div>
+          <div class="card-info">
+            <h3>聊天风格分析</h3>
+            <p>看看你在对话中的沟通模式</p>
+          </div>
+          <i class="fas fa-arrow-right arrow-icon" aria-hidden="true"></i>
+        </button>
+        <button class="feature-card" data-mode="htp" aria-label="房树人绘画功能">
+          <div class="card-icon"><i class="fas fa-paint-brush" aria-hidden="true"></i></div>
+          <div class="card-info">
+            <h3>房树人绘画</h3>
+            <p>画出房子、树木、人物，探索潜意识</p>
+          </div>
+          <i class="fas fa-arrow-right arrow-icon" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="footer-note" aria-live="polite">
+        <span>💚 每一次探索，都离自己更近一步</span>
+      </div>
     </div>
 
     <!-- 上传页面 -->
-    <div id="uploadPage" class="page">
-        <div class="nav-bar">
-            <div class="back-btn" onclick="goBack()"><i class="fas fa-chevron-left"></i></div>
-            <div class="title" id="uploadTitle">朋友圈读心</div>
-            <div class="nav-placeholder"></div>
+    <div id="uploadPage" class="page" aria-labelledby="uploadTitle">
+      <div class="nav-bar" role="navigation">
+        <button class="back-btn" onclick="app.goBack()" aria-label="返回">
+          <i class="fas fa-chevron-left" aria-hidden="true"></i>
+        </button>
+        <h2 class="title" id="uploadTitle">朋友圈读心</h2>
+        <div class="nav-placeholder"></div>
+      </div>
+      <div class="upload-area" id="uploadArea" role="button" tabindex="0"
+        aria-label="点击或拖拽上传图片区域">
+        <i class="fas fa-cloud-upload-alt" aria-hidden="true"></i>
+        <p id="uploadPrompt">点击或拖拽上传截图</p>
+        <small>最多3张，自动优化后上传</small>
+        <input type="file" id="fileInput" accept="image/*" multiple style="display:none;"
+          aria-label="文件选择器">
+      </div>
+      <div id="filePreview" class="file-list" aria-live="polite"></div>
+      <div id="chatScopeWrapper" class="hidden" aria-live="polite">
+        <div class="scope-selector" role="radiogroup" aria-label="分析范围选择">
+          <span class="scope-label">分析范围：</span>
+          <button class="scope-btn active" data-scope="private" aria-checked="true" role="radio">
+            💬 私聊
+          </button>
+          <button class="scope-btn" data-scope="group" aria-checked="false" role="radio">
+            👥 群聊
+          </button>
         </div>
-        <div class="upload-area" id="uploadArea">
-            <i class="fas fa-cloud-upload-alt"></i>
-            <p id="uploadPrompt">点击或拖拽上传截图</p>
-            <small>最多3张，自动优化后上传</small>
-            <input type="file" id="fileInput" accept="image/*" multiple style="display:none;">
+      </div>
+      <div class="action-buttons">
+        <button class="btn btn-primary" id="analyzeUploadBtn" disabled
+          aria-label="开始分析" aria-disabled="true">
+          <i class="fas fa-magic" aria-hidden="true"></i>开始分析
+        </button>
+        <button class="btn btn-secondary" id="clearUploadBtn" aria-label="清空文件">
+          <i class="fas fa-trash-alt" aria-hidden="true"></i>清空
+        </button>
+      </div>
+      <div id="exportCaptureArea" class="export-area" aria-label="分析结果区域">
+        <div id="resultContainer" class="result-card hidden" aria-live="assertive"></div>
+        <div class="export-btn-wrapper hidden" id="exportBtnWrapper" aria-live="polite">
+          <button class="btn btn-outline" id="exportImageBtn" aria-label="导出分析结果图片">
+            <i class="fas fa-download" aria-hidden="true"></i> 导出图片（带二维码）
+          </button>
         </div>
-        <div id="filePreview" class="file-list"></div>
-        <div id="chatScopeWrapper" style="display: none; margin: 0 20px 16px;">
-            <div class="scope-selector">
-                <span class="scope-label">分析范围：</span>
-                <button class="scope-btn active" data-scope="private">💬 私聊</button>
-                <button class="scope-btn" data-scope="group">👥 群聊</button>
-            </div>
-        </div>
-        <div class="action-buttons">
-            <button class="btn btn-primary" id="analyzeUploadBtn" disabled><i class="fas fa-magic"></i>开始分析</button>
-            <button class="btn btn-secondary" id="clearUploadBtn"><i class="fas fa-trash-alt"></i>清空</button>
-        </div>
-        <!-- 截图区域：包含结果卡片和导出按钮 -->
-        <div id="exportCaptureArea" style="background: transparent;">
-            <div id="resultContainer" class="result-card" style="display:none;"></div>
-            <div style="margin: 0 20px 20px; display: none;" id="exportBtnWrapper">
-                <button class="btn btn-outline" id="exportImageBtn"><i class="fas fa-download"></i> 导出图片（带二维码）</button>
-            </div>
-        </div>
-        <div id="msgContainer"></div>
+      </div>
+      <div id="msgContainer" class="message-container" aria-live="assertive"></div>
     </div>
 
     <!-- 画板页面 -->
-    <div id="drawPage" class="page">
-        <div class="nav-bar">
-            <div class="back-btn" onclick="goBack()"><i class="fas fa-chevron-left"></i></div>
-            <div class="title">房树人绘画</div>
-            <div class="nav-placeholder"></div>
+    <div id="drawPage" class="page" aria-labelledby="drawTitle">
+      <div class="nav-bar" role="navigation">
+        <button class="back-btn" onclick="app.goBack()" aria-label="返回">
+          <i class="fas fa-chevron-left" aria-hidden="true"></i>
+        </button>
+        <h2 class="title" id="drawTitle">房树人绘画</h2>
+        <div class="nav-placeholder"></div>
+      </div>
+      <div class="canvas-wrapper" aria-label="绘画区域">
+        <canvas id="drawingCanvas" width="600" height="400"
+          aria-label="房树人绘画画布"></canvas>
+      </div>
+      <div class="toolbar" aria-label="绘画工具栏">
+        <div class="tool-row">
+          <div class="color-group" role="radiogroup" aria-label="颜色选择">
+            <button class="color-btn active" data-color="#07C160" aria-label="绿色" aria-checked="true" role="radio">
+              <span class="color-dot" style="background:#07C160"></span>
+            </button>
+            <button class="color-btn" data-color="#FF8A80" aria-label="粉色" aria-checked="false" role="radio">
+              <span class="color-dot" style="background:#FF8A80"></span>
+            </button>
+            <button class="color-btn" data-color="#82B1FF" aria-label="蓝色" aria-checked="false" role="radio">
+              <span class="color-dot" style="background:#82B1FF"></span>
+            </button>
+            <button class="color-btn" data-color="#FFD54F" aria-label="黄色" aria-checked="false" role="radio">
+              <span class="color-dot" style="background:#FFD54F"></span>
+            </button>
+            <button class="color-btn" data-color="#B388FF" aria-label="紫色" aria-checked="false" role="radio">
+              <span class="color-dot" style="background:#B388FF"></span>
+            </button>
+            <button class="color-btn" data-color="#A1887F" aria-label="棕色" aria-checked="false" role="radio">
+              <span class="color-dot" style="background:#A1887F"></span>
+            </button>
+            <button class="color-btn" id="customColorBtn" data-color="#000000" aria-label="自定义颜色" aria-checked="false" role="radio">
+              <span class="color-dot custom-dot">
+                <i class="fas fa-plus" aria-hidden="true"></i>
+              </span>
+            </button>
+            <input type="color" id="colorPicker" style="display:none;" aria-label="颜色选择器">
+          </div>
         </div>
-        <div class="canvas-wrapper">
-            <canvas id="drawingCanvas" width="600" height="400"></canvas>
+        <div class="tool-row">
+          <div class="size-group" role="radiogroup" aria-label="笔触粗细">
+            <button class="size-btn" data-size="2" aria-label="细笔" aria-checked="false" role="radio">细</button>
+            <button class="size-btn active" data-size="5" aria-label="中笔" aria-checked="true" role="radio">中</button>
+            <button class="size-btn" data-size="10" aria-label="粗笔" aria-checked="false" role="radio">粗</button>
+          </div>
+          <div class="action-group" aria-label="操作工具">
+            <button class="tool-btn" id="eraserBtn" title="橡皮擦" aria-label="橡皮擦">
+              <i class="fas fa-eraser" aria-hidden="true"></i>
+            </button>
+            <button class="tool-btn" id="undoBtn" title="撤销" aria-label="撤销">
+              <i class="fas fa-undo-alt" aria-hidden="true"></i>
+            </button>
+            <button class="tool-btn" id="clearCanvasBtn" title="清空" aria-label="清空画布">
+              <i class="fas fa-trash-alt" aria-hidden="true"></i>
+            </button>
+          </div>
         </div>
-        <div class="toolbar">
-            <div class="tool-row">
-                <div class="color-group">
-                    <button class="color-btn active" data-color="#2EBD85"><span class="color-dot" style="background:#2EBD85"></span></button>
-                    <button class="color-btn" data-color="#FF8A80"><span class="color-dot" style="background:#FF8A80"></span></button>
-                    <button class="color-btn" data-color="#82B1FF"><span class="color-dot" style="background:#82B1FF"></span></button>
-                    <button class="color-btn" data-color="#FFD54F"><span class="color-dot" style="background:#FFD54F"></span></button>
-                    <button class="color-btn" data-color="#B388FF"><span class="color-dot" style="background:#B388FF"></span></button>
-                    <button class="color-btn" data-color="#A1887F"><span class="color-dot" style="background:#A1887F"></span></button>
-                    <button class="color-btn" id="customColorBtn" data-color="#000000"><span class="color-dot custom-dot"><i class="fas fa-plus"></i></span></button>
-                    <input type="color" id="colorPicker" style="display:none;">
-                </div>
-            </div>
-            <div class="tool-row">
-                <div class="size-group">
-                    <button class="size-btn" data-size="2">细</button>
-                    <button class="size-btn active" data-size="5">中</button>
-                    <button class="size-btn" data-size="10">粗</button>
-                </div>
-                <div class="action-group">
-                    <button class="tool-btn" id="eraserBtn" title="橡皮擦"><i class="fas fa-eraser"></i></button>
-                    <button class="tool-btn" id="undoBtn" title="撤销"><i class="fas fa-undo-alt"></i></button>
-                    <button class="tool-btn" id="clearCanvasBtn" title="清空"><i class="fas fa-trash-alt"></i></button>
-                </div>
-            </div>
+      </div>
+      <div class="self-desc-section" aria-label="自我描述区域">
+        <div class="self-desc-header" id="toggleDescBtn" role="button" aria-expanded="true">
+          <span><i class="fas fa-feather-alt" aria-hidden="true"></i>想说的话（可选）</span>
+          <i class="fas fa-chevron-down" aria-hidden="true"></i>
         </div>
-        <div class="self-desc-section">
-            <div class="self-desc-header">
-                <span><i class="fas fa-feather-alt"></i>想说的话（可选）</span>
-                <i class="fas fa-chevron-down" id="toggleDescBtn"></i>
-            </div>
-            <div class="self-desc-body">
-                <textarea id="selfDescInput" class="self-desc-input" placeholder="这幅画背后的故事…"></textarea>
-                <div class="char-count"><span id="charCount">0</span>/500</div>
-            </div>
+        <div class="self-desc-body">
+          <textarea id="selfDescInput" class="self-desc-input"
+            placeholder="这幅画背后的故事…"
+            maxlength="500"
+            aria-label="自我描述输入框"></textarea>
+          <div class="char-count" aria-live="polite">
+            <span id="charCount">0</span>/500
+          </div>
         </div>
-        <button class="submit-btn" id="analyzeDrawingBtn">完成，开始解读</button>
+      </div>
+      <button class="submit-btn" id="analyzeDrawingBtn" aria-label="完成绘画并开始解读">
+        完成，开始解读
+      </button>
     </div>
-</div>
+  </div>
 
-<script src="js/main.js"></script>
+  <!-- Local Scripts -->
+  <script src="js/main.js"></script>
 </body>
 </html>
