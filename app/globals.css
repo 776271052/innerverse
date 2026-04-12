@@ -31,7 +31,3 @@ body {
 .prose {
   color: inherit;
 }
-
-.prose h1, .prose h2, .prose h3 {
-  color: inherit;
-}
