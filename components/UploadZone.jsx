@@ -10,13 +10,16 @@ export default function UploadZone({ images, setImages }) {
 
   const processFiles = (files) => {
     const newFiles = Array.from(files).slice(0, 3 - images.length)
+    
     newFiles.forEach(file => {
       if (file.size > 5 * 1024 * 1024) {
         toast.error('图片大小不能超过 5MB')
         return
       }
       const reader = new FileReader()
-      reader.onload = (e) => setImages(prev => [...prev, e.target.result])
+      reader.onload = (e) => {
+        setImages(prev => [...prev, e.target.result])
+      }
       reader.readAsDataURL(file)
     })
   }
@@ -52,7 +55,7 @@ export default function UploadZone({ images, setImages }) {
       {images.length === 0 ? (
         <div className="h-80 flex flex-col items-center justify-center text-center">
           <Upload className="w-20 h-20 text-pastel-purple mb-6" />
-          <p className="text-3xl font-medium">上传 1-3 张照片</p>
+          <p className="text-3xl font-medium text-foreground">上传 1-3 张照片</p>
           <p className="text-muted-foreground mt-3 text-lg">拖拽到此处 或 点击上传</p>
           <p className="text-sm text-muted-foreground mt-6">支持 JPG、PNG • 最大 5MB/张</p>
         </div>
@@ -60,10 +63,17 @@ export default function UploadZone({ images, setImages }) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {images.map((img, index) => (
             <div key={index} className="relative group rounded-2xl overflow-hidden shadow-lg">
-              <img src={img} alt={`图片 ${index + 1}`} className="w-full aspect-square object-cover" />
+              <img 
+                src={img} 
+                alt={`上传图片 ${index + 1}`} 
+                className="w-full aspect-square object-cover" 
+              />
               <button
-                onClick={(e) => { e.stopPropagation(); removeImage(index) }}
-                className="absolute top-3 right-3 bg-white dark:bg-slate-800 rounded-full p-2 shadow-md opacity-0 group-hover:opacity-100 hover:bg-red-50"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  removeImage(index)
+                }}
+                className="absolute top-3 right-3 bg-white dark:bg-slate-800 rounded-full p-2 shadow-md opacity-0 group-hover:opacity-100 transition-all hover:bg-red-50"
               >
                 <X className="w-5 h-5 text-red-500" />
               </button>
