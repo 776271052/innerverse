@@ -1,7 +1,7 @@
 {
   "functions": {
-    "app/api/**/*": {
-      "runtime": "edge"
+    "api/**/*": {
+      "runtime": "nodejs24.x"
     }
   }
 }
