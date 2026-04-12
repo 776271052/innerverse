@@ -1,15 +1,7 @@
 {
   "functions": {
-    "api/analyze.js": {
-      "runtime": "edge",
-      "maxDuration": 60,
-      "memory": 1024
+    "app/api/**/*": {
+      "runtime": "edge"
     }
-  },
-  "buildCommand": "npm run build",
-  "installCommand": "npm install",
-  "outputDirectory": ".",
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" }
-  ]
+  }
 }
