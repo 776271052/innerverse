@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Sparkles, Copy, Download } from 'lucide-react'
+import { Sparkles, Copy } from 'lucide-react'
 import { toast } from 'sonner'
 
 export default function AnalysisResult({ result, images }) {
@@ -31,7 +31,6 @@ export default function AnalysisResult({ result, images }) {
         </button>
       </div>
 
-      {/* 图片预览 */}
       <div className="flex gap-4 mb-10 overflow-x-auto pb-4">
         {images.map((img, i) => (
           <img 
@@ -43,7 +42,6 @@ export default function AnalysisResult({ result, images }) {
         ))}
       </div>
 
-      {/* 分析结果内容 */}
       <div 
         className="prose prose-lg dark:prose-invert max-w-none leading-relaxed text-[17px]"
         dangerouslySetInnerHTML={{ __html: result }}
