@@ -15,7 +15,7 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: '请上传至少一张图片' }, { status: 400 })
     }
 
-    // 试用次数校验（匿名用户）
+    // 获取用户身份
     const authHeader = request.headers.get('authorization')
     let userId = null
 
@@ -24,35 +24,30 @@ export async function POST(request) {
       const user = await AuthService.verifySession(token)
       if (user) userId = user.id
     } else {
-      // 匿名用户使用 localStorage 中的 anonymous_user_id（前端已处理）
-      userId = 'anonymous_' + (body.anonymousId || 'temp')
-    }
-
-    // 校验试用次数
-    if (!userId.includes('anonymous')) {
-      const trial = await AuthService.validateTrialUsage(userId)
-      if (!trial.allowed) {
-        return NextResponse.json({ success: false, error: '试用次数已用完，请登录账号' }, { status: 403 })
-      }
+      userId = 'anonymous_' + (body.anonymousId || Date.now())
     }
 
     // 调用 AI 分析
-    const aiResult = await aiManager.analyze(images, type, selfDesc)
+    const aiResult = await aiManager.analyze(images, type, selfDesc || '')
 
     if (!aiResult.success) {
       return NextResponse.json(aiResult, { status: 500 })
     }
 
-    // 保存到数据库（仅登录用户）
-    if (userId && !userId.includes('anonymous')) {
+    // 保存分析记录到 Upstash
+    if (userId) {
       await db.createAnalysis(userId, {
         type,
         result: aiResult.result,
-        images: images.length,
-        scope: scope || 'private'
+        imagesCount: images.length,
+        scope: scope || 'private',
+        createdAt: Date.now().toString()
       })
-      // 增加试用计数
-      await AuthService.incrementTrialUsage(userId)
+
+      // 增加试用次数（仅非管理员）
+      if (!userId.startsWith('admin')) {
+        await AuthService.incrementTrialUsage(userId)
+      }
     }
 
     return NextResponse.json({
